@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # some notes and changes from https://github.com/naelyn/playa-mesos/commit/7b6606cf9e45782bc41f1698d360c03034f75f18
+# 
+# since this is the only thing run on re-provision, we kind of need to uninstall old things and update new things
 #
 set -o errexit -o nounset -o pipefail
 function -h {
@@ -51,9 +53,26 @@ function install_mesos {
   esac
 }
 
+function remove_docker_io {
+  apt-get remove docker.io
+  rm -f /usr/local/bin/docker
+  apt-get update
+}
+
+function configure_lxc_docker {
+  apt-get update
+  curl -sSL https://get.docker.com/ubuntu/ | sudo sh
+  # for some reason, (flaky vm net? bad docker.com net?) i had to apt-get update several times to get all the docker packages available
+  apt-get update
+  apt-get update
+}
+
+
 function configure_slave {
   if [[ ${slave_hostname+isset} ]]
   then
+    remove_docker_io
+    configure_lxc_docker
     mkdir -p /etc/mesos-slave
     echo "$slave_hostname" > /etc/mesos-slave/hostname
     echo "docker,mesos" > /etc/mesos-slave/containerizers
@@ -71,12 +90,12 @@ function install_apt_source {
 function install_with_apt {
   apt_ curl unzip
   install_apt_source $1
-  apt_ zookeeperd zookeeper zookeeper-bin lxc-docker mesos marathon deimos
+  apt_ zookeeperd zookeeper zookeeper-bin lxc-docker mesos marathon
 }
 
 function apt_ {
-  as_root env DEBIAN_FRONTEND=noninteractive aptitude update
-  as_root env DEBIAN_FRONTEND=noninteractive aptitude install -y "$@"
+  as_root env DEBIAN_FRONTEND=noninteractive apt-get update
+  as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "$@"
 }
 
 function as_root {
