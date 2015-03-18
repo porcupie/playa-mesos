@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# some notes and changes from https://github.com/naelyn/playa-mesos/commit/7b6606cf9e45782bc41f1698d360c03034f75f18
+#
 set -o errexit -o nounset -o pipefail
 function -h {
 cat <<USAGE
@@ -53,6 +56,8 @@ function configure_slave {
   then
     mkdir -p /etc/mesos-slave
     echo "$slave_hostname" > /etc/mesos-slave/hostname
+    echo "docker,mesos" > /etc/mesos-slave/containerizers
+    echo "5mins" > /etc/mesos-slave/executor_registration_timeout
   fi
 }
 
@@ -66,9 +71,7 @@ function install_apt_source {
 function install_with_apt {
   apt_ curl unzip
   install_apt_source $1
-  apt_ zookeeperd zookeeper zookeeper-bin docker.io mesos marathon deimos
-  as_root ln -sf /usr/bin/docker.io /usr/local/bin/docker
-  as_root sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
+  apt_ zookeeperd zookeeper zookeeper-bin lxc-docker mesos marathon deimos
 }
 
 function apt_ {

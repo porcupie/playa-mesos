@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -o errexit -o nounset -o pipefail
+
+# run this before lib/scripts/ubuntu/docker
+
+
+# we want to remove any older docker.io installations
+apt-get remove docker.io
+
+# remove old softlink
+rm -f /usr/local/bin/docker

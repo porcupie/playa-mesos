@@ -1,9 +1,12 @@
 #!/bin/bash
+set -x
 set -e
 set -u
 
 function globals(){
-  readonly CONF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+# for some reason i was getting 2 lines of same PWD ?  - maybe mac os x issue?
+# readonly CONF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+  readonly CONF_ROOT=`( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd ) | head -1 `
   readonly BUILD_ROOT="${CONF_ROOT}/packer"
   readonly PM_CONFIG="${CONF_ROOT}/config.json"
   readonly PLATFORM=$(cat "$PM_CONFIG"|python -c 'import json,sys;obj=json.load(sys.stdin);print obj["platform"]')

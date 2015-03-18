@@ -75,7 +75,9 @@
         "{{user `scripts`}}/common/vagrant",
         "{{user `scripts`}}/common/vmtools-virtualbox",
         "{{user `scripts`}}/ubuntu/python-tools",
-        "{{user `scripts`}}/ubuntu/java"
+        "{{user `scripts`}}/ubuntu/java",
+        "{{user `scripts`}}/ubuntu/remove-docker-io",
+        "{{user `scripts`}}/ubuntu/docker"
       ],
       "type": "shell"
     },
